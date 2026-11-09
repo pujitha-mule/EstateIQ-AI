@@ -1,0 +1,31 @@
+
+/* EstateIQ AI additional styles */
+
+/* Smooth transitions */
+button,
+a,
+input,
+select,
+textarea {
+  transition: all 0.15s ease-in-out;
+}
+
+/* Prevent horizontal overflow */
+html,
+body,
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Consistent disabled state */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Consistent text selection */
+::selection {
+  background: #b9f5d0;
+  color: #142b46;
+}
