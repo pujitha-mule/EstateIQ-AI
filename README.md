@@ -1,38 +1,54 @@
 # EstateIQ AI
-## Technical Design Document (TDD)
 
-**Project:** EstateIQ AI  
-**Tagline:** Every enquiry matters. Every visit counts.  
-**Version:** 1.0  
-**Document Type:** Technical Design Document
+### Every enquiry matters. Every visit counts.
 
-### 1. Project Overview
+An AI-assisted real-estate lead management and site-visit booking platform built for sales teams.
 
-EstateIQ AI is an AI-powered lead-response and site-visit management platform designed for real-estate developers.
+## Project Links
 
-The system helps sales teams respond to incoming enquiries, understand buyer requirements, provide project information, schedule site visits, and transfer qualified leads to sales executives.
+| Resource | Link |
+|---|---|
+| GitHub Repository | [EstateIQ AI](https://github.com/pujitha-mule/EstateIQ-AI) |
+| Live Frontend | [Open EstateIQ AI](https://estate-iq-l29z33ua9-pujitha-mules-projects.vercel.app/) |
+| Backend API | [Render Backend](https://estateiq-ai-backend.onrender.com) |
+| API Documentation | [FastAPI Swagger Docs](https://estateiq-ai-backend.onrender.com/docs) |
+| Health Check | [Backend Health](https://estateiq-ai-backend.onrender.com/api/health) |
 
-The platform is designed to support English, Hindi, and Gujarati conversations.
+---
 
-### 2. Problem Statement
+## 1. Project Overview
 
-Real-estate sales teams often face delays in responding to enquiries. Manual lead handling can result in missed opportunities, inconsistent follow-ups, duplicate records, and poor visibility into sales performance.
+EstateIQ AI is a real-estate lead management and site-visit coordination platform designed to help property sales teams manage buyer enquiries, track leads, provide project information, and schedule property visits.
 
-EstateIQ AI aims to improve this process through automated lead engagement, buyer qualification, visit scheduling, and centralized lead management.
+The platform brings lead management, an assistant interface, booking workflows, and sales analytics into one workspace.
 
-### 3. System Objectives
+The prototype is designed around a real-estate developer operating two residential projects in Ahmedabad, Gujarat.
 
-- Respond to incoming enquiries within two minutes.
-- Maintain a unified lead database.
-- Identify duplicate leads.
-- Qualify buyers based on their requirements.
-- Answer questions using verified project information.
-- Schedule available site-visit slots.
-- Send visit reminders through configured communication channels.
-- Transfer conversations to sales executives when human assistance is required.
-- Provide dashboard and source-wise performance analytics.
+## 2. Problem Statement
 
-### 4. Technology Stack
+Real-estate sales teams often face delays in responding to incoming enquiries. Manual lead handling can result in missed opportunities, inconsistent follow-ups, duplicate records, and limited visibility into sales performance.
+
+EstateIQ AI aims to simplify this process through:
+
+- Centralized lead management.
+- Buyer requirement tracking.
+- Project information access.
+- Site-visit scheduling.
+- Human escalation.
+- Sales dashboard and analytics.
+
+## 3. Key Objectives
+
+- Organize enquiries in a unified lead database.
+- Track buyer preferences, budgets, and requirements.
+- Provide project information through an assistant interface.
+- Display available site-visit slots.
+- Prevent duplicate confirmed bookings for a lead.
+- Allow sales executives to manage enquiries.
+- Support human handoff for enquiries requiring personal assistance.
+- Provide visibility into lead and booking performance.
+
+## 4. Technology Stack
 
 | Layer | Technology |
 |---|---|
@@ -42,164 +58,239 @@ EstateIQ AI aims to improve this process through automated lead engagement, buye
 | Database | PostgreSQL |
 | ORM | SQLAlchemy |
 | Authentication | JWT |
-| AI integration | LLM API with project information retrieval |
-| Testing | Pytest |
-| Frontend deployment | Vercel |
-| Backend deployment | Render |
+| Password Security | Passlib, bcrypt |
+| API Testing | Pytest, HTTPX |
+| Frontend Deployment | Vercel |
+| Backend Deployment | Render |
 
-### 5. System Architecture
+## 5. System Architecture
 
-The application follows a client-server architecture.
+EstateIQ AI follows a client-server architecture.
 
-**Frontend**
-- Provides the sales dashboard.
-- Displays and manages leads.
+### Frontend
+- Provides the sales workspace.
+- Displays the dashboard and lead records.
 - Provides the AI assistant interface.
-- Displays site-visit slots and bookings.
-- Shows analytics and project settings.
+- Displays site-visit availability and bookings.
+- Provides analytics and settings screens.
 
-**Backend**
-- Exposes REST API endpoints.
-- Handles authentication and authorization.
-- Manages lead records and duplicate checks.
-- Processes AI chat requests.
-- Validates and manages site-visit bookings.
-- Provides dashboard statistics.
+### Backend
+- Exposes REST API endpoints through FastAPI.
+- Handles authentication.
+- Manages lead and project records.
+- Processes assistant requests.
+- Validates site-visit bookings.
+- Handles booking cancellation and human handoff.
+- Provides dashboard information.
 
-**Database**
-- Stores users and roles.
-- Stores projects and lead information.
-- Stores chat messages and handoff records.
-- Stores booking and consent information.
+### Database
+PostgreSQL stores application records, including:
+- Users and roles.
+- Projects.
+- Project fact sheets.
+- Leads.
+- Visit slots.
+- Bookings.
 
-### 6. Core Modules
+### Request Flow
 
-**6.1 Authentication**
-- Login using registered credentials.
+1. A user signs in through the React frontend.
+2. The frontend sends authenticated requests to FastAPI.
+3. FastAPI validates requests and applies business rules.
+4. SQLAlchemy communicates with PostgreSQL.
+5. The backend returns responses to the frontend.
+6. The frontend updates the relevant screens.
+
+## 6. Application Modules
+
+### 6.1 Authentication
+- User login.
 - JWT-based authentication.
-- Role-based access for sales heads and sales executives.
+- User roles for admin, sales executives, and sales head.
+- Authenticated user information.
 
-**6.2 Lead Management**
-- Create and view leads.
-- Search leads by name or phone number.
-- Detect duplicate phone numbers.
-- Track lead status and source.
-- View individual lead details.
+### 6.2 Lead Management
+- View and manage lead records.
+- Track buyer contact information.
+- Store project preferences and configurations.
+- Track lead source, status, and priority.
+- Update lead information.
 
-**6.3 AI Assistant**
-- Process buyer enquiries.
-- Collect buyer preferences and requirements.
-- Retrieve answers from verified project information.
-- Support English, Hindi, and Gujarati.
-- Escalate unanswered or sensitive queries to a human executive.
-- Preserve conversation history.
+### 6.3 AI Assistant
+- Assistant interface for buyer enquiries.
+- Rule-based responses using available project information.
+- Basic project fact-based responses.
+- Conversation history.
+- Human escalation through the handoff API.
 
-**6.4 Site-Visit Booking**
-- Display available time slots.
+**Implementation note:** The current assistant is deterministic and rule-based. It is not yet connected to a production LLM or complete retrieval-augmented generation pipeline.
+
+### 6.4 Site-Visit Booking
+- Retrieve available visit slots.
+- Filter availability by project and date.
+- Create bookings.
 - Associate bookings with leads.
-- Prevent double booking.
-- Store booking details.
-- Support reminders and booking status tracking.
+- Validate slot capacity.
+- Prevent multiple confirmed bookings for the same lead.
+- Cancel existing bookings.
 
-**6.5 Human Handoff**
-- Transfer a conversation to an assigned sales executive.
-- Include the buyer's requirements and conversation summary.
-- Flag unresolved or sensitive conversations for sales-head review.
+### 6.5 Human Handoff
+- Create escalation requests.
+- Assign escalations to sales executives.
+- Support human review of enquiries that need additional assistance.
 
-**6.6 Dashboard and Analytics**
-- Display total leads and booked visits.
-- Show conversion rates.
-- Display active handoffs.
-- Provide lead-source breakdowns.
-- Track response and booking performance using actual recorded data.
+### 6.6 Dashboard and Analytics
+- Total lead information.
+- Booking information.
+- Visit statistics.
+- Lead status breakdown.
+- Lead source breakdown.
+- Handoff information.
+- Available conversion metrics.
 
-**6.7 Project Settings**
-- Maintain verified project information.
-- Manage available site-visit slots.
-- Keep project facts grounded in approved source material.
+Metrics depend on the data currently available in the database.
 
-### 7. Database Design
+### 6.7 Project Settings
+The frontend includes a settings interface for project-related information. A complete approved-facts management API and administration workflow remain future improvements.
 
-The primary entities are:
+## 7. Database Design
+
+The main SQLAlchemy entities are:
 
 | Entity | Purpose |
 |---|---|
-| User | Stores user accounts, roles, and credentials |
-| Project | Stores project details |
-| Lead | Stores buyer contact and qualification details |
-| Booking | Stores site-visit reservations |
-| Chat | Stores conversation messages |
-| Consent | Records communication consent |
+| User | User accounts, roles, and password hashes |
+| Project | Residential project information |
+| FactSheet | Project facts and verification status |
+| Lead | Buyer information and requirements |
+| VisitSlot | Available site-visit time slots |
+| Booking | Site-visit reservations and status |
 
-Relationships:
+### Entity Relationships
+
 - A project can have multiple leads.
-- A lead can have multiple chat messages.
-- A lead can have site-visit booking records.
-- A user can manage or receive assigned leads.
+- A project can have multiple visit slots.
+- A lead belongs to a project.
+- A booking connects a lead, project, and visit time.
+- Project fact sheets store information associated with a project.
 
-### 8. API Design
+## 8. API Documentation
 
-The backend exposes REST APIs under `/api`.
+All application API routes are available under `/api`.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/health` | Health check |
 | POST | `/api/auth/login` | Authenticate user |
+| GET | `/api/auth/me` | Retrieve authenticated user |
 | GET | `/api/leads` | Retrieve leads |
 | POST | `/api/leads` | Create a lead |
+| GET | `/api/leads/{lead_id}` | Retrieve lead details |
+| PATCH | `/api/leads/{lead_id}` | Update lead |
 | GET | `/api/slots` | Retrieve available slots |
 | GET | `/api/bookings` | Retrieve bookings |
-| POST | `/api/bookings` | Create a booking |
-| GET | `/api/chat/{lead_id}` | Retrieve chat history |
-| POST | `/api/chat` | Process an AI chat message |
-| POST | `/api/handoff` | Create a human handoff |
+| POST | `/api/bookings` | Create booking |
+| PATCH | `/api/bookings/{booking_id}/cancel` | Cancel booking |
+| POST | `/api/chat` | Process assistant message |
+| GET | `/api/chat/{lead_id}` | Retrieve conversation history |
+| POST | `/api/handoff` | Create human handoff |
 | GET | `/api/dashboard` | Retrieve dashboard metrics |
 
-### 9. Security and Privacy
+Interactive API documentation:
 
-- Authenticate protected API requests using JWT.
-- Keep secrets and API keys in environment variables.
-- Validate user input on the backend.
-- Restrict access according to user roles.
-- Record communication consent before sending promotional messages.
-- Avoid exposing sensitive buyer information unnecessarily.
-- Follow applicable DPDP requirements and WhatsApp messaging policies.
+[Open EstateIQ AI Swagger Documentation](https://estateiq-ai-backend.onrender.com/docs)
 
-### 10. Error Handling
+## 9. Security and Privacy
 
-The application should handle:
-- Invalid login credentials.
-- Missing or invalid input.
-- Duplicate lead creation.
-- Unavailable booking slots.
-- Concurrent booking attempts.
-- AI service failures.
-- Database connection errors.
-- Unauthorized API requests.
+- JWT authentication for protected API requests.
+- Password hashing for stored credentials.
+- Environment variables for database connections and application secrets.
+- Backend request validation.
+- Role information associated with user accounts.
+- Synthetic sample data for demonstration.
 
-Errors should return appropriate HTTP status codes and clear messages.
+Before production use, the application requires further work on comprehensive role-based authorization, audit logging, data retention, consent management, and applicable DPDP and WhatsApp policies.
 
-### 11. Testing Strategy
+## 10. Testing
 
-Testing should cover:
-- Authentication and authorization.
-- Lead creation and duplicate detection.
-- AI responses and escalation conditions.
-- Booking availability and double-booking prevention.
-- API validation.
-- Dashboard metric accuracy.
-- Frontend and backend integration.
+Backend testing was performed using Pytest.
 
-### 12. Future Improvements
+Previously recorded test results:
 
-- Live WhatsApp Business API integration.
-- Automated reminder delivery.
-- Production LLM integration with retrieval.
-- Advanced sales performance analytics.
-- Calendar integration.
-- Automated lead assignment.
-- Production monitoring and audit logs.
+- 22 backend tests passed.
+- Authentication endpoints tested.
+- Lead endpoints tested.
+- Booking availability and creation tested.
+- Booking cancellation tested.
+- Human handoff tested.
+- Dashboard API tested.
 
-### 13. Conclusion
+The frontend production build was also tested, with responsive checks across mobile viewport sizes.
 
-EstateIQ AI is designed to streamline real-estate lead management by combining AI-assisted buyer engagement, centralized lead tracking, site-visit scheduling, and sales analytics in one platform.
+## 11. Deployment
+
+### Frontend: Vercel
+
+Production frontend:
+
+https://estate-iq-l29z33ua9-pujitha-mules-projects.vercel.app/
+
+### Backend: Render
+
+Backend URL:
+
+https://estateiq-ai-backend.onrender.com
+
+### Database: PostgreSQL
+
+The deployed backend connects to a managed PostgreSQL database hosted on Render.
+
+### Environment Variables
+
+Backend:
+- `DATABASE_URL`
+- `JWT_SECRET_KEY`
+- `FRONTEND_ORIGIN`
+- `PYTHON_VERSION`
+
+Frontend:
+- `VITE_API_BASE_URL`
+
+Actual secret values are configured through deployment environment settings and are not included in the repository.
+
+## 12. Current Limitations
+
+The current implementation is a working prototype. The following features require further development:
+
+- Production LLM integration and retrieval-based responses.
+- Complete English, Hindi, and Gujarati conversational support.
+- Live WhatsApp and SMS notifications.
+- Automated visit reminder delivery.
+- Complete approved project fact management.
+- Advanced duplicate lead detection.
+- Production-grade multi-instance booking concurrency.
+- Expanded role-based authorization.
+- More comprehensive sales analytics and audit logs.
+
+## 13. Future Enhancements
+
+- Integrate an LLM with verified project information retrieval.
+- Add WhatsApp Business API integration.
+- Automate booking confirmations and reminders.
+- Improve duplicate lead detection.
+- Add advanced lead assignment and follow-up workflows.
+- Introduce calendar integration.
+- Expand analytics and reporting.
+- Strengthen security, monitoring, and audit capabilities.
+
+## 14. Conclusion
+
+EstateIQ AI brings real-estate lead management, assistant-based buyer engagement, human handoff, and site-visit coordination into a single application.
+
+The project provides a foundation for improving sales-team workflows and reducing manual effort while leaving room for further development in AI integration, automation, and production readiness.
+
+---
+
+**Built with React, FastAPI, PostgreSQL, and Python.**
+
+**EstateIQ AI | Every enquiry matters. Every visit counts.**
